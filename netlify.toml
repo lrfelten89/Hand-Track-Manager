@@ -1,0 +1,12 @@
+# Static site at the repo root; serverless functions in netlify/functions.
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# ES modules must arrive with a JavaScript content type or the browser refuses
+# to execute them. Netlify sets this correctly today; pinning it means a change
+# in their defaults cannot silently break the app.
+[[headers]]
+  for = "/*.mjs"
+  [headers.values]
+    Content-Type = "text/javascript; charset=utf-8"

@@ -1,0 +1,8 @@
+{
+  "name": "meetmanager",
+  "private": true,
+  "description": "MeetManager static app + Netlify functions (timer PIN verification / custom tokens)",
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

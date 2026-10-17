@@ -1,0 +1,29 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "meets": {
+      "$meetId": {
+        "ownerUid": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && ((!data.exists() && newData.val() === auth.uid) || data.val() === auth.uid)"
+        },
+        "timerAssignments": {
+          ".read": "auth != null && root.child('meets').child($meetId).child('ownerUid').val() === auth.uid",
+          "$timerNumber": {
+            ".read": "auth != null && root.child('meets').child($meetId).child('ownerUid').val() === auth.uid",
+            ".write": "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && root.child('meets').child($meetId).child('ownerUid').val() === auth.uid"
+          }
+        },
+        "currentRace": {
+          ".read": "auth != null && (auth.token.meetId === $meetId || root.child('meets').child($meetId).child('ownerUid').val() === auth.uid)",
+          ".write": "auth != null && (auth.token.meetId === $meetId || root.child('meets').child($meetId).child('ownerUid').val() === auth.uid)"
+        }
+      }
+    },
+    "currentRace": {
+      ".read": "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'",
+      ".write": "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'"
+    }
+  }
+}

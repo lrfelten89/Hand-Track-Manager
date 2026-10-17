@@ -1,0 +1,10 @@
+{
+  "name": "MeetManager — RaceTime",
+  "short_name": "RaceTime",
+  "description": "Track meet timing, rosters, documents, and results for youth meets.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f7a4d",
+  "icons": []
+}
