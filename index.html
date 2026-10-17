@@ -5003,8 +5003,8 @@
     document.getElementById('custom-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'flex';
     document.getElementById('director-bar').style.display = 'none';
-    const sb = document.getElementById('starter-bar'); if (sb) sb.style.display = 'none';
     document.getElementById('timer-bar').style.display = 'none';
+    syncStarterBar();
     updateTimerMobileSummary(remoteState);
     if (remoteState) {
       lastBuildKey = null;
