@@ -1,7 +1,7 @@
 // MeetManager service worker.
 // CACHE_VERSION must be bumped with every release (it is tied to the app
 // version) — this is what invalidates stale cached clients after a deploy.
-const CACHE_VERSION = 'meetmanager-v0.4.10';
+const CACHE_VERSION = 'meetmanager-v0.4.11';
 const APP_SHELL = [
   './',
   'index.html',

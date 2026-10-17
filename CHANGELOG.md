@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.11 — 2026-10-17
+
+- The version number now shows in the bottom-left corner of every screen, not just the login screen. It ignores taps and is hidden when printing.
+
 ## v0.4.10 — 2026-10-17
 
 **See which build a device is running.** The login screen now shows the version number, so a phone still running an older copy is easy to spot. When a newly deployed build takes over while a device is on the login screen, the page reloads once to run it. It never reloads during timing.
