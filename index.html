@@ -5005,6 +5005,7 @@
     document.getElementById('director-bar').style.display = 'none';
     document.getElementById('timer-bar').style.display = 'none';
     syncStarterBar();
+    setTimeout(syncStarterBar, 100);
     updateTimerMobileSummary(remoteState);
     if (remoteState) {
       lastBuildKey = null;
@@ -5094,7 +5095,11 @@
   document.getElementById('btn-clear-import').addEventListener('click', clearRunmeetImport);
   document.getElementById('btn-director-sign-in')?.addEventListener('click', () => directorSignIn(false));
   document.getElementById('btn-director-create')?.addEventListener('click', () => directorSignIn(true));
-  document.getElementById('btn-timer-secure-join')?.addEventListener('click', secureTimerJoin);
+  const joinBtn = document.getElementById('btn-timer-secure-join');
+  if (joinBtn) {
+    joinBtn.addEventListener('click', secureTimerJoin);
+    joinBtn.addEventListener('touchstart', (e) => { e.preventDefault(); secureTimerJoin(); }, { passive: false });
+  }
   document.getElementById('btn-auth-sign-out')?.addEventListener('click', authSignOut);
   document.getElementById('btn-save-timer-assignment')?.addEventListener('click', saveTimerAssignment);
   // Archive panel: initialize only when opened, so supabase-js is never
@@ -5127,7 +5132,11 @@
   document.getElementById('role-judge').addEventListener('click', () => selectRole('timer'));
   document.getElementById('btn-launch').addEventListener('click', launch);
   document.getElementById('btn-start').addEventListener('click', masterStart);
-  document.getElementById('btn-starter-start')?.addEventListener('click', masterStart);
+  const starterStartBtn = document.getElementById('btn-starter-start');
+  if (starterStartBtn) {
+    starterStartBtn.addEventListener('click', masterStart);
+    starterStartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); masterStart(); }, { passive: false });
+  }
   document.getElementById('btn-reset').addEventListener('click', () => { if (confirm('Reset the race? All times will be cleared.')) masterReset(); });
   document.getElementById('btn-export-dir').addEventListener('click', exportCurrentRaceCsv);
   const backTimerBtn = document.getElementById('btn-back-timer');
