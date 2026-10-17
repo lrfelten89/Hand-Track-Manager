@@ -850,8 +850,13 @@
       setAuthMessage('timer-auth-message', 'Enter the Meet ID, timer number, and PIN.', true);
       return;
     }
+    if (authLoginInProgress) return; // ignore a duplicate tap while joining
+    authLoginInProgress = true;
     setAuthMessage('timer-auth-message', 'Joining meet…');
     try {
+      // A sign-out started on page load (stale timer session) must finish
+      // before the new session begins, or it can land on top of it.
+      await pendingStaleSignOut;
       // PIN verification happens server-side in a Netlify Function, which
       // mints a Firebase custom token scoped to this meet/timer. Database
       // rules then enforce auth.token.meetId === $meetId, so the PIN gates
@@ -881,6 +886,8 @@
     } catch (err) {
       console.error('Timer login failed:', err);
       setAuthMessage('timer-auth-message', err?.message || 'Unable to join the meet.', true);
+    } finally {
+      authLoginInProgress = false;
     }
   }
 
@@ -896,7 +903,16 @@
     showAuthScreen();
   }
 
+  // Firebase delivers auth notifications asynchronously. During a login the
+  // app deliberately signs out and back in, so a "signed out" notice can
+  // arrive AFTER the new session is live and the workspace is open. Ignore
+  // any notice that no longer matches the real current user, and ignore
+  // everything while a login is in progress.
+  let authLoginInProgress = false;
+  let pendingStaleSignOut = Promise.resolve();
   onAuthStateChanged(auth, user => {
+    if (authLoginInProgress) return;
+    if ((user?.uid || null) !== (auth.currentUser?.uid || null)) return;
     firebaseAuthReady = !!user;
     if (!user) { showAuthScreen(); return; }
     const savedMode = localStorage.getItem('meetManagerAuthMode');
@@ -910,7 +926,7 @@
     } else if (!authenticatedMode && savedMode === 'timer') {
       // Timer PINs are intentionally re-entered after a page refresh; drop
       // any persisted custom-token session so stale claims can't linger.
-      if (!user.isAnonymous) signOut(auth).catch(() => {});
+      if (!user.isAnonymous) pendingStaleSignOut = signOut(auth).catch(() => {});
       showAuthScreen();
     }
   });
@@ -4991,7 +5007,7 @@
   function enterTimerWorkspace() {
     const roleChip = document.getElementById('role-chip');
     if (roleChip) {
-      const prefix = authenticatedTimerNumber ? ('Timer ' + authenticatedTimerNumber) : 'Timer';
+      const prefix = (authenticatedTimerNumber ? ('Timer ' + authenticatedTimerNumber) : 'Timer') + (timerCanStart ? ' • Starter' : '');
       roleChip.textContent = myLanes.length ? (prefix + ' • Lanes ' + myLanes.join(',')) : prefix;
       roleChip.className = 'role-chip timer';
       applyRoleLayoutClass();
@@ -5005,7 +5021,6 @@
     document.getElementById('director-bar').style.display = 'none';
     document.getElementById('timer-bar').style.display = 'none';
     syncStarterBar();
-    setTimeout(syncStarterBar, 100);
     updateTimerMobileSummary(remoteState);
     if (remoteState) {
       lastBuildKey = null;
@@ -5095,11 +5110,7 @@
   document.getElementById('btn-clear-import').addEventListener('click', clearRunmeetImport);
   document.getElementById('btn-director-sign-in')?.addEventListener('click', () => directorSignIn(false));
   document.getElementById('btn-director-create')?.addEventListener('click', () => directorSignIn(true));
-  const joinBtn = document.getElementById('btn-timer-secure-join');
-  if (joinBtn) {
-    joinBtn.addEventListener('click', secureTimerJoin);
-    joinBtn.addEventListener('touchstart', (e) => { e.preventDefault(); secureTimerJoin(); }, { passive: false });
-  }
+  document.getElementById('btn-timer-secure-join')?.addEventListener('click', secureTimerJoin);
   document.getElementById('btn-auth-sign-out')?.addEventListener('click', authSignOut);
   document.getElementById('btn-save-timer-assignment')?.addEventListener('click', saveTimerAssignment);
   // Archive panel: initialize only when opened, so supabase-js is never
@@ -5132,11 +5143,7 @@
   document.getElementById('role-judge').addEventListener('click', () => selectRole('timer'));
   document.getElementById('btn-launch').addEventListener('click', launch);
   document.getElementById('btn-start').addEventListener('click', masterStart);
-  const starterStartBtn = document.getElementById('btn-starter-start');
-  if (starterStartBtn) {
-    starterStartBtn.addEventListener('click', masterStart);
-    starterStartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); masterStart(); }, { passive: false });
-  }
+  document.getElementById('btn-starter-start')?.addEventListener('click', masterStart);
   document.getElementById('btn-reset').addEventListener('click', () => { if (confirm('Reset the race? All times will be cleared.')) masterReset(); });
   document.getElementById('btn-export-dir').addEventListener('click', exportCurrentRaceCsv);
   const backTimerBtn = document.getElementById('btn-back-timer');

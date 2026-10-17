@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.9 — 2026-10-17
+
+**Timers join on the first tap.** Joining signs the device out and back in, and Firebase reports each change a moment later. A late "signed out" report could arrive after the timer workspace had opened and send the device back to the login screen, so the first tap on Join Meet looked like it did nothing. Reports that no longer match the current session are now ignored, a duplicate tap during a join is ignored, and a sign-out left over from an earlier timer session finishes before the new login starts.
+
+- The timer's role chip now reads "Timer N • Starter" when the device is allowed to start races, so a starter phone is easy to confirm at a glance.
+
+**Director sees timer assignments.** Firebase rules need a `.read` on `timerAssignments` itself, not just on each timer number, because the list is read as a whole (see `firebase-rules.example.json`). The ownership check now finishes before the list is read.
+
 ## v0.4.0 — 2026-07-26
 
 **Recorded times now survive a lost connection.** A failed write used to be applied to local state and forgotten — the timer saw their tap, nothing retried it, and a refresh threw it away. Failed writes are now persisted to localStorage as serializable operations and replayed automatically when the connection returns.
