@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.10 — 2026-10-17
+
+**See which build a device is running.** The login screen now shows the version number, so a phone still running an older copy is easy to spot. When a newly deployed build takes over while a device is on the login screen, the page reloads once to run it. It never reloads during timing.
+
 ## v0.4.9 — 2026-10-17
 
 **Timers join on the first tap.** Joining signs the device out and back in, and Firebase reports each change a moment later. A late "signed out" report could arrive after the timer workspace had opened and send the device back to the login screen, so the first tap on Join Meet looked like it did nothing. Reports that no longer match the current session are now ignored, a duplicate tap during a join is ignored, and a sign-out left over from an earlier timer session finishes before the new login starts.

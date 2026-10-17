@@ -1230,3 +1230,6 @@ body.timer-role #roster-sticky-header { display: none !important; }
 }
 .pending-badge::before { content: '⟳'; font-size: 13px; }
 .pending-badge:hover { background: #ffefc2; }
+
+/* Build label on the login screen: lets anyone confirm which version a device is running. */
+.app-version-label { margin-top: 18px; text-align: center; font-size: 12px; color: #7a847f; }

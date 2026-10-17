@@ -51,6 +51,7 @@
         <div class="auth-message" id="timer-auth-message"></div>
       </section>
     </div>
+    <div class="app-version-label" id="app-version-label">MeetManager v0.4.10</div>
   </div>
 </div>
 
@@ -5290,7 +5291,17 @@
   // keep working with no internet (common at a track). Registration is a no-op
   // where service workers are unavailable (e.g. file://).
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
-    navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker registration failed:', err));
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => reg.update().catch(() => {}))
+      .catch(err => console.warn('Service worker registration failed:', err));
+    // When a newly deployed build takes over, reload once so this device runs
+    // it, but only from the login screen, never in the middle of timing.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloadedForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      const onLogin = document.getElementById('auth-screen')?.style.display !== 'none';
+      if (hadController && onLogin && !reloadedForUpdate) { reloadedForUpdate = true; location.reload(); }
+    });
   }
 
   const timerMobileToggleAll = document.getElementById('timer-mobile-toggle-all');
