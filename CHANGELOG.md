@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.12 — 2026-10-28
+
+**Combined races now upload to Athletic.net correctly.** Combining girls and boys (or several age groups) into one race is only how the heat is run; on Athletic.net each athlete still scores in their own event. The export used to tag every athlete in a combined race as gender X under the combined label (for example "11-12/11-12"), which matched none of the meet's events and ranked boys against girls. Each athlete is now exported under their own gender and age group from the heat sheet, and [Place] is worked out within that group. [HeatPlace] is still the finishing position in the combined heat. The meet archive gets the same per-athlete gender and age group. Timing screens are unchanged.
+
 ## v0.4.11 — 2026-10-17
 
 - The version number now shows in the bottom-left corner of every screen, not just the login screen. It ignores taps and is hidden when printing.

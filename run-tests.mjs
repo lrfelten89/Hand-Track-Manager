@@ -25,6 +25,7 @@ import {
   normalizeAthleticNetGender,
   overallPlacesByRow,
   queueRaceGenderLabel,
+  resultGroupForCompetitor,
   resultRowsToAthleticNetRows,
   resultTimeToMs,
   sanitizeSpreadsheetCell,
@@ -230,6 +231,39 @@ test('cleanText collapses the whitespace RUNMEET exports are full of', () => {
 
 test('status keys are safe to use as Firebase child names', () => {
   assert.ok(!/[.#$/[\]]/.test(statusKeyForPosition('1.2')));
+});
+
+/* ── Combined races ──────────────────────────────────────────────────────── */
+
+test('a combined girls + boys race exports each athlete under their own gender and age group', () => {
+  // Bug: every athlete in a combined race was exported as gender X under the
+  // combined division, so the results matched none of the meet's Athletic.net
+  // events and boys were ranked against girls.
+  const girl = { gender: "Girls'", division: '11-12', combinedGender: 'Mixed', combinedDivision: '11-12/11-12' };
+  const boy = { gender: "Boys'", division: '11-12', combinedGender: 'Mixed', combinedDivision: '11-12/11-12' };
+  assert.deepEqual(resultGroupForCompetitor(girl, 'Mixed', '11-12/11-12'), { gender: "Girls'", ageGroup: '11-12' });
+  assert.deepEqual(resultGroupForCompetitor(boy, 'Mixed', '11-12/11-12'), { gender: "Boys'", ageGroup: '11-12' });
+});
+
+test('combined age groups keep each athlete in their own division', () => {
+  const c = { gender: 'Girls', division: '7-8', combinedGender: 'F', combinedDivision: '7-10' };
+  assert.equal(resultGroupForCompetitor(c, 'F', '7-10').ageGroup, '7-8');
+});
+
+test('combined values are only a fallback when the entry has none', () => {
+  assert.deepEqual(resultGroupForCompetitor({ combinedGender: 'Mixed', combinedDivision: 'Open' }, 'M', 'X'),
+    { gender: 'Mixed', ageGroup: 'Open' });
+  assert.deepEqual(resultGroupForCompetitor(null, 'M', '9-10'), { gender: 'M', ageGroup: '9-10' });
+});
+
+test('in a combined race, girls and boys are placed separately on Athletic.net', () => {
+  const H = ATHLETIC_NET_HEADERS;
+  const row = (gender, ms, name) => ({ eventName: '100m', gender, ageGroup: '7-8', race: 'Heat 1', status: 'OK',
+    result: fmt(ms), rawTimeMs: ms, athlete: name });
+  const out = resultRowsToAthleticNetRows([row('Boys', 15000, 'Smith, Ben'), row('Girls', 15500, 'Lee, Ava'), row('Boys', 16000, 'Cruz, Max')]);
+  const get = (r, col) => r[H.indexOf(col)];
+  assert.deepEqual(out.map(r => [get(r, 'Gender'), get(r, '[Place]'), get(r, '[Gender1]')]),
+    [['M', 1, 'M'], ['F', 1, 'F'], ['M', 2, 'M']]);
 });
 
 /* ── Report ──────────────────────────────────────────────────────────────── */

@@ -53,7 +53,7 @@
     </div>
   </div>
 </div>
-<div class="app-version-label" id="app-version-label" aria-hidden="true">MeetManager v0.4.11</div>
+<div class="app-version-label" id="app-version-label" aria-hidden="true">MeetManager v0.4.12</div>
 
 <!-- MODE SELECTION SCREEN -->
 <div id="mode-screen">
@@ -510,6 +510,7 @@
     normalizeRunmeetEventName,
     parseRunmeetHtmlDocument,
     queueRaceGenderLabel,
+    resultGroupForCompetitor,
     resultRowsToAthleticNetRows,
     sanitizeSpreadsheetCell,
     statusForPosition,
@@ -1906,8 +1907,8 @@
         rows.push({
           eventNumber: c ? c.eventNumber : '',
           eventName,
-          gender: c ? (c.combinedGender || c.gender || gender) : gender,
-          ageGroup: c ? (c.combinedDivision || c.division || ageGroup) : ageGroup,
+          gender: resultGroupForCompetitor(c, gender, ageGroup).gender,
+          ageGroup: resultGroupForCompetitor(c, gender, ageGroup).ageGroup,
           race: label,
           laneHip: hip,
           place: explicit ? '' : distPlace,
@@ -1929,8 +1930,8 @@
         rows.push({
           eventNumber: c.eventNumber || '',
           eventName,
-          gender: c.combinedGender || c.gender || gender,
-          ageGroup: c.combinedDivision || c.division || ageGroup,
+          gender: resultGroupForCompetitor(c, gender, ageGroup).gender,
+          ageGroup: resultGroupForCompetitor(c, gender, ageGroup).ageGroup,
           race: label,
           laneHip: pos,
           place: '',
@@ -1964,8 +1965,8 @@
         rows.push({
           eventNumber: c ? c.eventNumber : '',
           eventName,
-          gender: c ? (c.combinedGender || c.gender || gender) : gender,
-          ageGroup: c ? (c.combinedDivision || c.division || ageGroup) : ageGroup,
+          gender: resultGroupForCompetitor(c, gender, ageGroup).gender,
+          ageGroup: resultGroupForCompetitor(c, gender, ageGroup).ageGroup,
           race: label,
           laneHip: r.lane,
           place: eligible ? placeCounter : '',

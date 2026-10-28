@@ -1,1 +1,1 @@
-MeetManager master project v0.4.11
+MeetManager master project v0.4.12

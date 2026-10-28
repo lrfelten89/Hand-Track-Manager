@@ -46,6 +46,22 @@ function extractHeatNumber(value) {
   return m ? m[1] : '';                                 // custom labels: leave [Heat] blank
 }
 
+// Which gender and age group an athlete's RESULT belongs to. A combined race
+// (girls + boys, or several age groups run together) is only a way of running
+// the heat: on Athletic.net each athlete still scores in their own event, e.g.
+// Girls 7-8 100m and Boys 7-8 100m. Exporting the combined label instead
+// tagged every athlete "X" (mixed) under the combined division, which matched
+// none of the meet's events and ranked boys against girls. So the athlete's
+// own gender and division win; the combined values are only a fallback for an
+// entry that has none, and the race's own values a last resort.
+function resultGroupForCompetitor(c, fallbackGender, fallbackAgeGroup) {
+  if (!c) return { gender: fallbackGender || '', ageGroup: fallbackAgeGroup || '' };
+  return {
+    gender: c.gender || c.combinedGender || fallbackGender || '',
+    ageGroup: c.division || c.combinedDivision || fallbackAgeGroup || ''
+  };
+}
+
 function normalizeAthleticNetGender(value) {
   const v = String(value || '').trim().toLowerCase();
   if (!v) return '';
@@ -548,6 +564,7 @@ export {
   normalizeRunmeetEventName,
   overallPlacesByRow,
   queueRaceGenderLabel,
+  resultGroupForCompetitor,
   resultRowsToAthleticNetRows,
   resultTimeToMs,
   sanitizeSpreadsheetCell,
